@@ -21,7 +21,7 @@ import tensorflow.compat.v1 as tf
 import numpy as np
 from sklearn.metrics import mean_absolute_error
 from TimeGAN.utils import extract_time
-
+from tf_slim.layers import layers as _layers
  
 def predictive_score_metrics (ori_data, generated_data):
   """Report the performance of Post-hoc RNN one-step ahead prediction.
@@ -70,7 +70,7 @@ def predictive_score_metrics (ori_data, generated_data):
     with tf.variable_scope("predictor", reuse = tf.AUTO_REUSE) as vs:
       p_cell = tf.nn.rnn_cell.GRUCell(num_units=hidden_dim, activation=tf.nn.tanh, name = 'p_cell')
       p_outputs, p_last_states = tf.nn.dynamic_rnn(p_cell, x, dtype=tf.float32, sequence_length = t)
-      y_hat_logit = tf.contrib.layers.fully_connected(p_outputs, 1, activation_fn=None) 
+      y_hat_logit = _layers.fully_connected(p_outputs, 1, activation_fn=None) 
       y_hat = tf.nn.sigmoid(y_hat_logit)
       p_vars = [v for v in tf.all_variables() if v.name.startswith(vs.name)]
     
