@@ -17,10 +17,10 @@ Note: Use original data as training set to generater synthetic data (time-series
 """
 
 # Necessary Packages
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from utils import extract_time, rnn_cell, random_generator, batch_generator
-
+from tf_slim.layers import layers as _layers
 
 def timegan (ori_data, parameters):
   """TimeGAN function.
@@ -35,8 +35,9 @@ def timegan (ori_data, parameters):
     - generated_data: generated time-series data
   """
   # Initialization on the Graph
-  tf.reset_default_graph()
-
+  # tf.reset_default_graph()
+  tf.disable_v2_behavior()
+  
   # Basic Parameters
   no, seq_len, dim = np.asarray(ori_data).shape
     
@@ -94,7 +95,7 @@ def timegan (ori_data, parameters):
     with tf.variable_scope("embedder", reuse = tf.AUTO_REUSE):
       e_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_cell(module_name, hidden_dim) for _ in range(num_layers)])
       e_outputs, e_last_states = tf.nn.dynamic_rnn(e_cell, X, dtype=tf.float32, sequence_length = T)
-      H = tf.contrib.layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
+      H = _layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
     return H
       
   def recovery (H, T):   
@@ -110,7 +111,7 @@ def timegan (ori_data, parameters):
     with tf.variable_scope("recovery", reuse = tf.AUTO_REUSE):       
       r_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_cell(module_name, hidden_dim) for _ in range(num_layers)])
       r_outputs, r_last_states = tf.nn.dynamic_rnn(r_cell, H, dtype=tf.float32, sequence_length = T)
-      X_tilde = tf.contrib.layers.fully_connected(r_outputs, dim, activation_fn=tf.nn.sigmoid) 
+      X_tilde = _layers.fully_connected(r_outputs, dim, activation_fn=tf.nn.sigmoid) 
     return X_tilde
     
   def generator (Z, T):  
@@ -126,7 +127,7 @@ def timegan (ori_data, parameters):
     with tf.variable_scope("generator", reuse = tf.AUTO_REUSE):
       e_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_cell(module_name, hidden_dim) for _ in range(num_layers)])
       e_outputs, e_last_states = tf.nn.dynamic_rnn(e_cell, Z, dtype=tf.float32, sequence_length = T)
-      E = tf.contrib.layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
+      E = _layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
     return E
       
   def supervisor (H, T): 
@@ -142,7 +143,7 @@ def timegan (ori_data, parameters):
     with tf.variable_scope("supervisor", reuse = tf.AUTO_REUSE):
       e_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_cell(module_name, hidden_dim) for _ in range(num_layers-1)])
       e_outputs, e_last_states = tf.nn.dynamic_rnn(e_cell, H, dtype=tf.float32, sequence_length = T)
-      S = tf.contrib.layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
+      S = _layers.fully_connected(e_outputs, hidden_dim, activation_fn=tf.nn.sigmoid)     
     return S
           
   def discriminator (H, T):
@@ -158,7 +159,7 @@ def timegan (ori_data, parameters):
     with tf.variable_scope("discriminator", reuse = tf.AUTO_REUSE):
       d_cell = tf.nn.rnn_cell.MultiRNNCell([rnn_cell(module_name, hidden_dim) for _ in range(num_layers)])
       d_outputs, d_last_states = tf.nn.dynamic_rnn(d_cell, H, dtype=tf.float32, sequence_length = T)
-      Y_hat = tf.contrib.layers.fully_connected(d_outputs, 1, activation_fn=None) 
+      Y_hat = _layers.fully_connected(d_outputs, 1, activation_fn=None) 
     return Y_hat   
     
   # Embedder & Recovery
