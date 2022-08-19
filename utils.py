@@ -22,8 +22,8 @@ utils.py
 
 ## Necessary Packages
 import numpy as np
-import tensorflow as tf
-
+import tensorflow.compat.v1 as tf
+from tf_slim import layers as _layers
 
 def train_test_divide (data_x, data_x_hat, data_t, data_t_hat, train_rate = 0.8):
   """Divide train and test data for both original and synthetic data.
@@ -95,10 +95,10 @@ def rnn_cell(module_name, hidden_dim):
     rnn_cell = tf.nn.rnn_cell.GRUCell(num_units=hidden_dim, activation=tf.nn.tanh)
   # LSTM
   elif (module_name == 'lstm'):
-    rnn_cell = tf.contrib.rnn.BasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
+    rnn_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
   # LSTM Layer Normalization
   elif (module_name == 'lstmLN'):
-    rnn_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
+    rnn_cell = tf.nn.rnn_cell.LayerNormBasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
   return rnn_cell
 
 
