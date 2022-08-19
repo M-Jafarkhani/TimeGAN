@@ -17,7 +17,7 @@ Note: Use Post-hoc RNN to predict one-step ahead (last feature)
 """
 
 # Necessary Packages
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from sklearn.metrics import mean_absolute_error
 from utils import extract_time
