@@ -19,7 +19,7 @@ Note: Use original data as training set to generater synthetic data (time-series
 # Necessary Packages
 import tensorflow.compat.v1 as tf
 import numpy as np
-from utils import extract_time, rnn_cell, random_generator, batch_generator
+from TimeGAN.utils import extract_time, rnn_cell, random_generator, batch_generator
 from tf_slim.layers import layers as _layers
 
 def timegan (ori_data, parameters):
